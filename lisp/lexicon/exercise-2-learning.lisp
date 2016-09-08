@@ -7,6 +7,9 @@
 (defclass learned-color-category (color-category blackboard)
   ())
 
+(defclass iteration-counter ( )
+  ())
+
 ;; implement learner function
 (defun exercise-2-learn-hearer (success? word-received topic category-hearer context categories)
   "success - t or nil
@@ -29,16 +32,15 @@
     )
       (t ; if category is already here
        (setf (color-y category-hearer) 
-             (+ (* (color-y category-hearer) 0.9)
-               (* (color-y topic) 0.1))) 
+             (+ (* (color-y category-hearer) 0.98)
+               (* (color-y topic) 0.02))) 
        (setf (color-u category-hearer) 
-             (+ (* (color-u category-hearer) 0.9)
-                (* (color-u topic) 0.1)))
+             (+ (* (color-u category-hearer) 0.98)
+                (* (color-u topic) 0.02)))
        (setf (color-v category-hearer) 
-             (+ (* (color-v category-hearer) 0.9)
-                (* (color-v topic) 0.1)))
+             (+ (* (color-v category-hearer) 0.98)
+                (* (color-v topic) 0.02)))
               
-       
        ))
   
         categories)
