@@ -12,9 +12,10 @@ import Image
 
 from naoqi import ALProxy
 
+
 def showNaoImage(IP, PORT):
     """
-    First get an image from Nao, then show it on the screen with PIL.
+    First get an image from Nao, then save it on disc.
     """
 
     camProxy = ALProxy("ALVideoDevice", IP, PORT)
@@ -55,7 +56,7 @@ def showNaoImage(IP, PORT):
 def recognizeYellowRectangle():
     image = cv2.imread("camImage.png")
 
-    # find the blue color game in the image
+    # find the yellow color rectangle in the image
     upper = np.array([255, 255, 100])
     lower = np.array([170, 170, 0])
     mask = cv2.inRange(image, lower, upper)
@@ -66,11 +67,22 @@ def recognizeYellowRectangle():
 
     print cnts
 
+    is_recognized = False
     if cnts:
-        return True
-    else:
-        return False
-    
+        is_recognized = True
+        c = max(cnts, key=cv2.contourArea)
+
+        # approximate the contour
+        peri = cv2.arcLength(c, True)
+        approx = cv2.approxPolyDP(c, 0.05 * peri, True)
+
+        # draw a red bounding box surrounding the object
+        cv2.drawContours(image, [approx], -1, (0, 0, 255), 4)
+
+    cv2.imwrite("proImage.png", image)
+
+    return is_recognized
+
 
 def sayText(text, IP, PORT):
     tts = ALProxy("ALTextToSpeech", IP, PORT)
@@ -85,66 +97,20 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         IP = sys.argv[1]
 
-    starttime=time.time()
-    while True:
+    starttime = time.time()
+    x = 0
+    # while True:
+    while x < 5:
+        x += 1
         showNaoImage(IP, PORT)
 
         is_recognized = recognizeYellowRectangle()
 
         if is_recognized:
             print 'a'
-            sayText("recognized yellow", IP, PORT)
+            sayText("recognized yellow object", IP, PORT)
         else:
             print 'b'
             sayText("not recognized", IP, PORT)
 
         time.sleep(1.0 - ((time.time() - starttime) % 1.0))
-
-# import the necessary packages
-
-# from naoqi import ALProxy
-# import vision_definitions
-
-# import sys
-# import time
-
-# # Python Image Library
-# import Image
-
-
-# IP = "192.168.1.123"
-# PORT = 9559
-
-# tts = ALProxy("ALTextToSpeech", IP, PORT)
-# tts.say("Hello, world!")
-
-# tts.say("not using choreographe!")
-
-# resolution = vision_definitions.kQVGA
-# colorSpace = vision_definitions.kYUVColorSpace
-# fps = 5
-
-# videoClient = camProxy.subscribe("python_GVM", resolution, colorSpace, fps)
-# print videoClient
-
-# t0 = time.time()
-
-# # Get a camera image.
-# # image[6] contains the image data passed as an array of ASCII chars.
-# naoImage = camProxy.getImageRemote(videoClient)
-
-# t1 = time.time()
-
-# print "acquisition delay ", t1 - t0
-
-# camProxy.unsubscribe(videoClient)
-
-# imageWidth = naoImage[0]
-# imageHeight = naoImage[1]
-# array = naoImage[6]
-
-# # Create a PIL Image from our pixel array.
-# im = Image.fromstring("RGB", (imageWidth, imageHeight), array)
-
-# # Save the image.
-# im.save("camImage.png", "PNG")
