@@ -12,6 +12,60 @@ import Image
 
 from naoqi import ALProxy
 
+import Image
+
+class Position(object):
+    """docstring for Direction"""
+    def __init__(self, name, id, vertical, horizontal):
+        super(Direction, self).__init__()
+        self.name = name
+        self.id = id
+        self.vertical = vertical
+        self.horizontal = horizontal
+
+def detect_position(x, y, image):
+    vertical_center = 240
+
+    left_limit = 220
+    right_limit = 420
+
+    vertical = "up"
+    if y > vertical_center:
+        vertical = "down"
+
+    horizontal = "center"
+    if x < left_limit:
+        horizontal = "left"
+    elif x > right_limit:
+        horizontal = "right"
+
+    return (vertical, horizontal)
+
+def get_average_color_of_circle((x, y), n, image):
+#     """ Returns a 3-tuple containing the RGB value of the average color of the
+#     given circle bounded area of radius = n whose center
+#     is (x, y) in the given image"""
+
+    width, height, _ = image.shape
+
+    r, g, b = 0, 0, 0
+    count = 0
+    for s in range(x - n, x + n + 1):
+        for t in range(y - n, y + n + 1):
+            if ((s- x)**2 + (t- y)**2 <= n**2):
+                if s < height - 1 and s > 1  and t < width - 1 and t > 1:
+                    pixlr, pixlg, pixlb = image[t, s]
+                    r += pixlr
+                    g += pixlg
+                    b += pixlb
+                    count += 1
+
+    if count == 0:
+        count = 1
+
+    print ((r/count), (g/count), (b/count)), count
+    return ((r/count), (g/count), (b/count))
+
 
 def showNaoImage(IP, PORT):
     """
@@ -55,30 +109,45 @@ def showNaoImage(IP, PORT):
     im.save("camImage.png", "PNG")
 
 
-def recognizeBall():
-    img = cv2.imread("camImage.png",0)
+def recognizeCircle(file, output):
+    img = cv2.imread(file,0)
     img = cv2.medianBlur(img,5)
     cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
 
     circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,1,20,
-                                param1=50,param2=30,minRadius=0,maxRadius=100)
+                                param1=50,param2=30,minRadius=0,maxRadius=0)
 
-    circles = np.uint16(np.around(circles))
-    for i in circles[0,:]:
-        # draw the outer circle
-        cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
-        # draw the center of the circle
-        cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
-
-    cv2.imwrite("proImage.png", cimg)
+    img2 = cv2.imread(file)
 
 
     is_recognized = False
-    if len(circles) > 1:
+    if circles is not None:
         is_recognized = True
+        print circles
+
+        circles = np.uint16(np.around(circles))
+        for i in circles[0,:]:
+            color = get_average_color_of_circle((i[0],i[1]),i[2], img2)
+            position = detect_position(i[0], i[1], img2)
+            print position
+
+            # draw the outer circle
+            cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
+            # draw the center of the circle
+            cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
+
+
+            cv2.circle(img2,(i[0],i[1]),i[2],color, -1)
+
+
 
         print len(circles)
+    else:
+        cv2.imwrite(output, cimg)
+        
 
+    cv2.imwrite(output, img2)
+    # cv2.imwrite(output, cimg)
     return is_recognized
 
 
@@ -150,6 +219,18 @@ def sayText(text, IP, PORT):
     tts = ALProxy("ALTextToSpeech", IP, PORT)
     tts.say(text)
 
+class Color(object):
+    """docstring for Color"""
+    def __init__(self, lowH, lowS, lowV, upH, upS, upV, name):
+        super(Color, self).__init__()
+        self.lowH = lowH
+        self.lowS = lowS
+        self.lowV = lowV
+        self.upH = upH
+        self.upS = upS
+        self.upV = upV
+        self.name = name
+
 
 if __name__ == '__main__':
     IP = "192.168.1.104"  # Replace here with your NaoQi's IP address.
@@ -159,21 +240,11 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         IP = sys.argv[1]
 
-    starttime = time.time()
-    x = 0
-    # while True:
-    while x < 5:
-        x += 1
-        showNaoImage(IP, PORT)
+    files = ["train/train_1.png", "train/train_2.png", "train/train_3.png", "train/train_4.png"]
+    outputs = ["train/res_1.png", "train/res_2.png", "train/res_3.png", "train/res_4.png"]
+    # Color color = 
 
-        is_recognized = recognizeYellowRectangle()
-        # is_recognized = recognizeBall()
 
-        if is_recognized:
-            print 'a'
-            sayText("recognized blue object", IP, PORT)
-        else:
-            print 'b'
-            # sayText("not recognized", IP, PORT)
+    for file, output in zip(files, outputs):
+        recognizeCircle(file, output)
 
-        time.sleep(2.0 - ((time.time() - starttime) % 2.0))
