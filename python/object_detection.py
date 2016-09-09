@@ -38,7 +38,7 @@ def detect_position(x, y, image):
     if y > vertical_center:
         vertical = "down"
 
-    horizontal = "left"
+    horizontal = "center"
     if x < left_limit:
         horizontal = "left"
     elif x > right_limit:

@@ -17,39 +17,9 @@ def colorIndex(detected):
     return detected.index(max(detected))
 
 
-def nameColor(detected, names):
-
-    return random.choice(names[colorIndex(detected)])
-
-# colorsys.hsv_to_rgb(x)
-
-
-def reinforce(detected, chosen, answer, names):
-
-    c_index = colorIndex(detected)
-
-    if answer:
-        names[c_index] = [chosen]
-    else:
-        names[c_index].remove(chosen)
-
-    return names
-
-
 # TEACHER ROBOT
 
 # p_name: <name, name>
-
-def nameObject(c_detected, p_detected, c_name, p_name):
-
-    color = c_name[colorIndex(c_detected)]
-
-    if p_detected == 'left':
-        position = p_name[0]
-    else:
-        position = p_name[1]
-
-    return random.choice([color, position])
 
 
 class Teacher(object):
@@ -58,6 +28,19 @@ class Teacher(object):
         self.ns = NaoSpeak()
         self.c_name = c_name
         self.p_name = p_name
+
+    def nameObject(self,c_detected, p_detected):
+
+        color = self.c_name[colorIndex(c_detected)]
+
+        if p_detected == 'left':
+            position = self.p_name[0]
+        elif p_detected == 'center':
+            position = self.p_name[1]
+        else:
+            position = self.p_name[2]
+
+        return [color, position]
 
     def step(self):
 
@@ -69,35 +52,69 @@ class Teacher(object):
             c_detected = detected[0]
             p_detected = detected[1]
 
-            name = nameObject(c_detected, p_detected, self.c_name, self.p_name)
-            self.ns.say(name)
-
-# to teach, create a teacher:
-    # teacher = Teacher(c_name, p_name)
-# and teach as many times as waned:
-    # teacher.step()
+            name = self.nameObject(c_detected, p_detected)
+            self.ns.say(name[0])
+            self.ns.say(name[1])
 
 
-# class Learner(object):
+class Learner(object):
 
-# 	def __init__(self, ):
-# 		self.ns = NaoSpeak()
-# 		self.c_name = c_name
-
-# 	def step(self):
-
-# 		detected = detect_objects(img)
-
-# 		c_detected = detected[0][0]
-# 		p_detected = detected[0][1]
-
-# 		name = nameObject(c_detected, p_detected, self.c_name, self.p_name)
-# 		self.ns.say(name)
+    def __init__(self):
+        self.ns = NaoSpeak()
+        self.names = [['red', 'blue', 'green'], [
+            'red', 'blue', 'green'], ['red', 'blue', 'green']]
 
 
+    def nameColor(self, detected):
+        return random.choice(self.names[colorIndex(detected)])
+
+
+    def reinforce(self, detected, chosen, answer):
+
+        c_index = colorIndex(detected)
+
+        if answer:
+            self.names[c_index] = [chosen]
+            for index in [i for i in [0,1,2] if not i==c_index]:
+                self.names[index].remove(chosen)
+        else:
+            self.names[c_index].remove(chosen)
+
+
+    def step(self):
+
+        detected = detect_objects(img)
+        
+        if not detected:
+            self.ns.say("not recognized")
+        else:
+            choice = self.nameColor(c_detected)
+            ans = raw_input()
+
+            if ans == 'yes':
+                answer = 1
+            else:
+                answer = 0
+
+            self.reinforce(c_detected, chosen, answer)
+
+
+# LEARNER EXPERIMENT
+# if __name__ == '__main__':
+#   c_name = ['red', 'green', 'blue']
+#   p_name = ['left', 'right']
+
+#   learner = Learner(c_name, p_name)
+
+#   for i in [1,2,3,4,5]:
+#       learner.step()
+#       time.sleep(5)
+
+
+# TEACHER EXPERIMENT
 if __name__ == '__main__':
-    c_name = ['red', 'green', 'blue']
-    p_name = ['left', 'right']
+    c_name = ['azurro','verde', 'rosso']
+    p_name = ['sinistra', 'centro', 'distra']
 
     random.seed()
 
@@ -105,4 +122,4 @@ if __name__ == '__main__':
 
     for i in [1, 2, 3, 4, 5]:
         teacher.step()
-        time.sleep(5)
+        time.sleep(3)
