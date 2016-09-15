@@ -6,6 +6,7 @@ import numpy
 import motion
 from naoqi import ALProxy
 
+
 class NaoGestures():
     def __init__(self):
         # Get the Nao's IP and port

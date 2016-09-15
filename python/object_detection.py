@@ -1,5 +1,6 @@
-# -*- encoding: UTF-8 -*-
-# Get an image from NAO. Display it and save it using PIL.
+"""
+@author: Wojciech Kusa
+"""
 
 import numpy as np
 import cv2
@@ -7,7 +8,6 @@ import cv2
 from naoInit import NaoInit
 from naoGestures import NaoGestures
 import random
-
 
 import sys
 import time
@@ -17,7 +17,6 @@ import Image
 
 from naoqi import ALProxy
 
-import Image
 
 class Position(object):
     """docstring for Direction"""

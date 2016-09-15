@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-import sys
-import motion
 from naoqi import ALProxy
+
 
 class NaoSpeak():
     def __init__(self):
@@ -28,6 +27,7 @@ class NaoSpeak():
     def say(self, speech):
         self.ttsProxy.say(speech)
 
+
 if __name__ == "__main__":
     naoSpeak = NaoSpeak()
-    naoSpeak.say("posdraviam Melanch klepage")
+    naoSpeak.say("hello!")

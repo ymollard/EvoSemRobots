@@ -11,8 +11,9 @@ from touchsensor import Head
 
 # color-names: (name, name, name)
 
-
 head = Head()
+
+
 def colorIndex(detected):
 
     # detected: (float, float, float)
@@ -31,7 +32,7 @@ class Teacher(object):
         self.c_name = c_name
         self.p_name = p_name
 
-    def nameObject(self,c_detected, p_detected):
+    def nameObject(self, c_detected, p_detected):
 
         color = self.c_name[colorIndex(c_detected)]
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-import sys
-import motion
 from naoqi import ALProxy
+
 
 class NaoInit():
     def __init__(self):
@@ -42,6 +41,7 @@ class NaoInit():
         pStiffnessLists = 1.0
         pTimeLists = 1.0
         proxy.stiffnessInterpolation(pNames, pStiffnessLists, pTimeLists)
+
 
 if __name__ == "__main__":
     naoInit = NaoInit()
