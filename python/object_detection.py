@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 @author: Wojciech Kusa
 """
@@ -18,15 +20,6 @@ import Image
 from naoqi import ALProxy
 
 
-class Position(object):
-    """docstring for Direction"""
-    def __init__(self, name, id, vertical, horizontal):
-        super(Direction, self).__init__()
-        self.name = name
-        self.id = id
-        self.vertical = vertical
-        self.horizontal = horizontal
-
 def detect_position(x, y, image):
     vertical_center = 240
 
@@ -45,10 +38,10 @@ def detect_position(x, y, image):
 
     return (horizontal, vertical)
 
-def get_average_color_of_circle((x, y), n, image):
-#     """ Returns a 3-tuple containing the RGB value of the average color of the
-#     given circle bounded area of radius = n whose center
-#     is (x, y) in the given image"""
+def get_average_color_of_circle((x, y), n, image): 
+    """ Returns a 3-tuple containing the RGB value of the average color of the
+    given circle bounded area of radius = n whose center
+    is (x, y) in the given image"""
 
     width, height, _ = image.shape
 
@@ -73,7 +66,7 @@ def get_average_color_of_circle((x, y), n, image):
 
 
 def save_nao_image(IP, PORT, file):
-    """
+    """ 
     First get an image from Nao, then save it on disc.
     """
 
@@ -138,26 +131,13 @@ def detect_circle(IP, PORT, file, output):
         #     # print position
         #     print "color", color
 
-        #     naoGestures.doGesture(horizontal)
-        #     # ---
-        #     # say that recognized
-        #     # say_text(color, IP, PORT)
-        #     # say_text(position, IP, PORT)
-        #     # end
-        #     # ----
-
         #     # draw the outer circle
         #     cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
         #     # draw the center of the circle
         #     cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
 
-
-        #     cv2.circle(img2,(i[0],i[1]),i[2],color, -1)
-
+        # from all detected circles we choose only one
         circle = random.choice(circles[0])
-
-        # if circle is 
-        print circle
 
         color = get_average_color_of_circle((circle[0],circle[1]),circle[2], img2)
         horizontal, _ = detect_position(circle[0], circle[1], img2)
@@ -167,14 +147,12 @@ def detect_circle(IP, PORT, file, output):
         naoGestures.doGesture(horizontal)
         cv2.circle(img2,(circle[0],circle[1]),circle[2],color, -1)
 
-        print len(circles)
     else:
         cv2.imwrite(output, cimg)
         
 
     print "pic saved"
     cv2.imwrite(output, img2)
-    # cv2.imwrite(output, cimg)
     
     try:
         color
@@ -188,6 +166,11 @@ def detect_circle(IP, PORT, file, output):
 
 
 def detect_objects_from_nao():
+    """ wrapper method that takes picture using NAO robot camera
+    and then detects all circle lika objects, randomly chooses one
+    from all and calculates average color value and its position
+    on the image
+    """
     IP = "192.168.1.104"  # Replace here with your NaoQi's IP address.
     PORT = 9559
 
@@ -201,61 +184,42 @@ def detect_objects_from_nao():
     file = "test.png"
     output = "test_result.png"
 
-
     save_nao_image(IP, PORT, file)
 
     circle = detect_circle(IP, PORT, file, output)
 
-    # if is_recognized:
-    #     print 'a'
-    #     # say_text("recognized blue object", IP, PORT)
-    # else:
-    #     print 'b'
-    #     say_text("not recognized", IP, PORT)
-
-    # time.sleep(2.0 - ((time.time() - starttime) % 2.0))
-
     return circle
 
-def recognizeYellowRectangle():
-    image = cv2.imread("camImage.png")
+def recognize_rectangle(upper, lower):
+    """ method that tries to recognize the biggest rectangular
+    shape that fits into [lower, upper] bounds of RGB
+    color palette
 
-    # image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-    # blue hsv
-    # upper = np.array([100,50,50])
-    # lower = np.array([150,255,255])
-
-
-    # # blue
-    # upper = np.array([255, 100, 100])
-    # lower = np.array([150, 60, 60])
-
+    Sample values:
+    # blue
+    upper = np.array([255, 100, 100])
+    lower = np.array([150, 60, 60])
     # pink
-    # upper = np.array([255,222,243])
-    # lower = np.array([20,130,150])
-
+    upper = np.array([255,222,243])
+    lower = np.array([20,130,150])
     # yellow
-    # upper = np.array([255, 255, 100])
-    # lower = np.array([170, 170, 0])
-
-    # mask = cv2.inRange(image, lower, upper)
+    upper = np.array([255, 255, 100])
+    lower = np.array([170, 170, 0])
+    """
 
     # find contours in the masked image and keep the largest one
-    # find the blue color game in the image
     upper = np.array([255, 100, 100])
     lower = np.array([150, 0, 0])
+    
+    image = cv2.imread("camImage.png")
+
     mask = cv2.inRange(image, lower, upper)
 
     # find contours in the masked image and keep the largest one
     (_, cnts, _) = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)
     # res = cv2.bitwise_and(frame,frame, mask= mask)
-
     # kernel = np.ones((5, 5), np.uint8)
-
-
-
 
     for c in cnts:
             
@@ -265,7 +229,6 @@ def recognizeYellowRectangle():
         # draw a red bounding box surrounding the object
         cv2.drawContours(image, [approx], -1, (0, 0, 255), 4)
 
-
     is_recognized = False
     if cnts:
         c = max(cnts, key=cv2.contourArea)
@@ -273,7 +236,6 @@ def recognizeYellowRectangle():
         print c
         print len(c)
         # approximate the contour
-
 
     cv2.imwrite("proImage.png", image)
     # cv2.imwrite("resImage.png", res)
@@ -284,6 +246,7 @@ def recognizeYellowRectangle():
 def say_text(text, IP, PORT):
     tts = ALProxy("ALTextToSpeech", IP, PORT)
     tts.say(text)
+
 
 class Color(object):
     """docstring for Color"""
@@ -299,37 +262,4 @@ class Color(object):
 
 
 if __name__ == '__main__':
-    # IP = "192.168.1.104"  # Replace here with your NaoQi's IP address.
-    # PORT = 9559
-
-    # # Read IP address from first argument if any.
-    # if len(sys.argv) > 1:
-    #     IP = sys.argv[1]
-
-    # naoInit = NaoInit()
-    # naoInit.initPosition()
-
-    # naoGestures = NaoGestures()
-
-    # file = "test.png"
-    # output = "test_result.png"
-
-    # starttime = time.time()
-    # x = 0
-    # # while True:
-    # while x < 1:
-    #     x += 1
-    # save_nao_image(IP, PORT, file)
-
-    #     is_recognized = detect_circles(IP, PORT, file, output)
-
-    #     if is_recognized:
-    #         print 'a'
-    #         # say_text("recognized blue object", IP, PORT)
-    #     else:
-    #         print 'b'
-    #         say_text("not recognized", IP, PORT)
-
-    #     time.sleep(2.0 - ((time.time() - starttime) % 2.0))
-
     detect_objects_from_nao()

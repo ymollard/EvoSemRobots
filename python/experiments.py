@@ -3,15 +3,10 @@ from object_detection import detect_objects_from_nao
 from naoSpeak import NaoSpeak
 import time
 import random
-from touchsensor import Head
+from naoHeadTouch import NaoHeadTouch
 
-# names: ['red', 'blue', 'green']
-# names starts being [['red', 'blue', 'green'], ['red', 'blue', 'green'],
-# ['red', 'blue', 'green']]
 
-# color-names: (name, name, name)
-
-head = Head()
+head = NaoHeadTouch()
 
 
 def colorIndex(detected):
@@ -99,9 +94,8 @@ class Learner(object):
             self.ns.say(choice)
 #            ans = raw_input()
 
-            if head.head_yesorno():
-#            if ans == 'yes':
-               answer = 1
+            if head.headYesOrNo():
+                answer = 1
             else:
                 answer = 0
 
@@ -134,4 +128,4 @@ if __name__ == '__main__':
     for i in [1, 2, 3, 4, 5]:
         teacher.step()
         #time.sleep(3)
-        head.wait_for_headtouch()
+        head.waitForHeadTouch()
