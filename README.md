@@ -5,6 +5,11 @@ Repository consists of two folders which represents two different topics discuss
 - lisp - excercises on naming games and guessing games,
 - python - language games that uses comuter vision and NAO V5 robot.
 
+## versions
+
+- `CAES-demo` : release containing source code from final presentation. This one should run without any problems
+- `master` branch : minor fixes to increase readability but not tested on NAO robot
+
 ## lisp 
 
 Three excercises on color categories lexicon learning.
