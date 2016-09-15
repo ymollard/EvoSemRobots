@@ -157,6 +157,7 @@ def detect_circle(IP, PORT, file, output):
 
         circle = random.choice(circles[0])
 
+        # if circle is 
         print circle
 
         color = get_average_color_of_circle((circle[0],circle[1]),circle[2], img2)
@@ -172,8 +173,15 @@ def detect_circle(IP, PORT, file, output):
         cv2.imwrite(output, cimg)
         
 
+    print "pic saved"
     cv2.imwrite(output, img2)
     # cv2.imwrite(output, cimg)
+    
+    try:
+        color
+        horizontal
+    except:
+        return []
 
     print [color, horizontal]
 
@@ -195,7 +203,7 @@ def detect_objects_from_nao():
     output = "test_result.png"
 
 
-    # save_nao_image(IP, PORT, file)
+    save_nao_image(IP, PORT, file)
 
     circle = detect_circle(IP, PORT, file, output)
 
@@ -312,7 +320,7 @@ if __name__ == '__main__':
     # # while True:
     # while x < 1:
     #     x += 1
-    #     save_nao_image(IP, PORT, file)
+    # save_nao_image(IP, PORT, file)
 
     #     is_recognized = detect_circles(IP, PORT, file, output)
 

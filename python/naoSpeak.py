@@ -30,4 +30,4 @@ class NaoSpeak():
 
 if __name__ == "__main__":
     naoSpeak = NaoSpeak()
-    naoSpeak.say("Hello World!")
+    naoSpeak.say("posdraviam Melanch klepage")

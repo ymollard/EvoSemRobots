@@ -3,6 +3,7 @@ from object_detection import detect_objects_from_nao
 from naoSpeak import NaoSpeak
 import time
 import random
+from touchsensor import Head
 
 # names: ['red', 'blue', 'green']
 # names starts being [['red', 'blue', 'green'], ['red', 'blue', 'green'],
@@ -11,6 +12,7 @@ import random
 # color-names: (name, name, name)
 
 
+head = Head()
 def colorIndex(detected):
 
     # detected: (float, float, float)
@@ -72,49 +74,57 @@ class Learner(object):
     def reinforce(self, detected, chosen, answer):
 
         c_index = colorIndex(detected)
-
+        print 'index'
+        print c_index
         if answer:
             self.names[c_index] = [chosen]
+            print self.names[c_index]
             for index in [i for i in [0,1,2] if not i==c_index]:
-                self.names[index].remove(chosen)
+                if chosen in self.names[index]:
+                    self.names[index].remove(chosen)
         else:
             self.names[c_index].remove(chosen)
 
 
     def step(self):
 
-        detected = detect_objects(img)
-        
+        detected = detect_objects_from_nao()
+        print self.names
         if not detected:
             self.ns.say("not recognized")
         else:
+            c_detected = detected[0]
             choice = self.nameColor(c_detected)
-            ans = raw_input()
+            self.ns.say(choice)
+#            ans = raw_input()
 
-            if ans == 'yes':
-                answer = 1
+            if head.head_yesorno():
+#            if ans == 'yes':
+               answer = 1
             else:
                 answer = 0
 
-            self.reinforce(c_detected, chosen, answer)
+            self.reinforce(c_detected, choice, answer)
 
 
-# LEARNER EXPERIMENT
+# # LEARNER EXPERIMENT
 # if __name__ == '__main__':
-#   c_name = ['red', 'green', 'blue']
+#   c_name = ['blue', 'green', 'red']
 #   p_name = ['left', 'right']
 
-#   learner = Learner(c_name, p_name)
+#   learner = Learner()
 
-#   for i in [1,2,3,4,5]:
-#       learner.step()
-#       time.sleep(5)
+#   for i in range(1,20):
+#         learner.step()
+#         time.sleep(1)
 
 
 # TEACHER EXPERIMENT
 if __name__ == '__main__':
     c_name = ['azurro','verde', 'rosso']
     p_name = ['sinistra', 'centro', 'distra']
+#   c_name = ['blue', 'green', 'red']
+#   p_name = ['left', 'centre', 'right']
 
     random.seed()
 
@@ -122,4 +132,5 @@ if __name__ == '__main__':
 
     for i in [1, 2, 3, 4, 5]:
         teacher.step()
-        time.sleep(3)
+        #time.sleep(3)
+        head.wait_for_headtouch()
