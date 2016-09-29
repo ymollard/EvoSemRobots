@@ -112,7 +112,7 @@ def detect_circle(IP, PORT, file, output):
     img = cv2.medianBlur(img,5)
     cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
 
-    circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,1,20,
+    circles = cv2.HoughCircles(img, cv2.cv.CV_HOUGH_GRADIENT,1,20,
                                 param1=50,param2=30,minRadius=0,maxRadius=0)
 
     img2 = cv2.imread(file)
@@ -165,15 +165,12 @@ def detect_circle(IP, PORT, file, output):
     return [color, horizontal]
 
 
-def detect_objects_from_nao():
+def detect_objects_from_nao(ip, port):
     """ wrapper method that takes picture using NAO robot camera
     and then detects all circle lika objects, randomly chooses one
     from all and calculates average color value and its position
     on the image
     """
-    IP = "192.168.1.104"  # Replace here with your NaoQi's IP address.
-    PORT = 9559
-
     # Read IP address from first argument if any.
     if len(sys.argv) > 1:
         IP = sys.argv[1]
@@ -184,9 +181,9 @@ def detect_objects_from_nao():
     file = "test.png"
     output = "test_result.png"
 
-    save_nao_image(IP, PORT, file)
+    save_nao_image(ip, port, file)
 
-    circle = detect_circle(IP, PORT, file, output)
+    circle = detect_circle(ip, port, file, output)
 
     return circle
 

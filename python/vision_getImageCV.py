@@ -7,9 +7,10 @@ import Image
 from naoqi import ALProxy
 import vision_definitions
 
-# Python Image Library
-IP = "192.168.1.109" # Replace here with your NaoQi's IP address.
-PORT = 9559
+ipFile = open("ip.txt")
+lines = ipFile.read().replace("\r", "").split("\n")
+IP = lines[0]
+PORT = int(lines[1])
 
 resolution = vision_definitions.kVGA
 colorSpace = vision_definitions.kRGBColorSpace

@@ -103,8 +103,10 @@ class ImageWidget(QWidget):
 
 
 if __name__ == '__main__':
-    IP = "192.168.1.123"  # Replace here with your NaoQi's IP address.
-    PORT = 9559
+    ipFile = open("ip.txt")
+    lines = ipFile.read().replace("\r", "").split("\n")
+    IP = lines[0]
+    PORT = int(lines[1])
     CameraID = 0
 
     # Read IP address from first argument if any.

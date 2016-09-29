@@ -8,8 +8,10 @@ from naoqi import ALProxy
 import vision_definitions
 import time
 
-IP = "192.168.1.123"  # Replace here with your NAOqi's IP address.
-PORT = 9559
+ipFile = open("ip.txt")
+lines = ipFile.read().replace("\r", "").split("\n")
+IP = lines[0]
+PORT = int(lines[1])
 
 ####
 # Create proxy on ALVideoDevice

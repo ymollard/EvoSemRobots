@@ -16,6 +16,8 @@ class NaoSpeak():
             print "Could not open file ip.txt"
             ipAdd = raw_input("Please write Nao's IP address... ")
             port = raw_input("Please write Nao's port... ")
+        self.ip = ipAdd
+        self.port = port
 
         # Init proxies.
         try:

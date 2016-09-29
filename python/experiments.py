@@ -42,7 +42,7 @@ class Teacher(object):
 
     def step(self):
 
-        detected = detect_objects_from_nao()
+        detected = detect_objects_from_nao(self.ns.ip, self.ns.port)
 
         if not detected:
             self.ns.say("not recognized")
@@ -84,7 +84,7 @@ class Learner(object):
 
     def step(self):
 
-        detected = detect_objects_from_nao()
+        detected = detect_objects_from_nao(self.ns.ip, self.ns.port)
         print self.names
         if not detected:
             self.ns.say("not recognized")
@@ -116,10 +116,10 @@ class Learner(object):
 
 # TEACHER EXPERIMENT
 if __name__ == '__main__':
-    c_name = ['azurro','verde', 'rosso']
-    p_name = ['sinistra', 'centro', 'distra']
-#   c_name = ['blue', 'green', 'red']
-#   p_name = ['left', 'centre', 'right']
+#    c_name = ['blue','verde', 'rosso']
+#    p_name = ['sinistra', 'centro', 'distra']
+    c_name = ['blue', 'green', 'red']
+    p_name = ['left', 'centre', 'right']
 
     random.seed()
 
@@ -128,4 +128,4 @@ if __name__ == '__main__':
     for i in [1, 2, 3, 4, 5]:
         teacher.step()
         #time.sleep(3)
-        head.waitForHeadTouch()
+        head.wait_for_headtouch()
